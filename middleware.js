@@ -3,6 +3,7 @@ const Review = require("./models/review");
 const ExpressError = require("./utilis/ExpressError.js");
 const {listingSchema, reviewSchema} = require("./schema.js");  //Joi
 
+
 module.exports.isLoggedIn = (req, res, next) => {
     if (!req.isAuthenticated()) {
 
