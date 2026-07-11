@@ -1,0 +1,204 @@
+<% layout("layouts/boilerplate") %>
+
+    <div class="show-page">
+
+        <!-- Back Button -->
+        <a href="/listings" class="show-back-btn">
+            <i class="fa-solid fa-arrow-left"></i> Back to listings
+        </a>
+
+        <!-- Hero Image -->
+        <div class="show-hero">
+            <img src="<%= listing.image.url %>" alt="<%= listing.title %>" />
+            <div class="show-category-badge">
+                <%= listing.category || "Stay" %>
+            </div>
+        </div>
+
+        <div class="show-content">
+
+            <!-- Left Column -->
+            <div class="show-left">
+
+                <!-- Title & Location -->
+                <div class="show-header">
+                    <h1>
+                        <%= listing.title %>
+                    </h1>
+                    <p class="show-location"><i class="fa-solid fa-location-dot"></i>
+                        <%= listing.location %>, <%= listing.country %>
+                    </p>
+                </div>
+
+                <hr />
+
+                <!-- Host Info -->
+                <div class="show-host">
+                    <div class="show-host-avatar">
+                        <%= listing.owner ? listing.owner.username.charAt(0).toUpperCase() : "?" %>
+                    </div>
+                    <div>
+                        <p class="show-host-label">Hosted by</p>
+                        <p class="show-host-name">
+                            <%= listing.owner ? listing.owner.username : "Unknown" %>
+                        </p>
+                    </div>
+                </div>
+
+                <hr />
+
+                <!-- Description -->
+                <div class="show-description">
+                    <h5>About this place</h5>
+                    <p>
+                        <%= listing.description %>
+                    </p>
+                </div>
+
+                <hr />
+
+                <!-- Map Section -->
+                <div class="show-map-section">
+                    <h5><i class="fa-solid fa-map-location-dot"></i> Location</h5>
+                    <div id="map" data-lat="<%= listing.latitude %>" data-lng="<%= listing.longitude %>"
+                        data-title="<%= listing.title %>"></div>
+                    <p class="show-map-label">
+                        <%= listing.location %>, <%= listing.country %>
+                    </p>
+                    <p class="text-muted">
+                        <i class="fa-solid fa-location-dot"></i>
+                        Exact location will be provided after booking.
+                    </p>
+                </div>
+
+                <hr />
+
+                <!-- Edit/Delete (Owner only) -->
+                <% if (currentUser && listing.owner && currentUser._id.equals(listing.owner._id)) { %>
+                    <div class="show-actions">
+                        <a href="/listings/<%= listing._id %>/edit" class="show-edit-btn">
+                            <i class="fa-solid fa-pen"></i> Edit Listing
+                        </a>
+                        <form action="/listings/<%= listing._id %>?_method=DELETE" method="post">
+                            <button class="show-delete-btn">
+                                <i class="fa-solid fa-trash"></i> Delete
+                            </button>
+                        </form>
+                    </div>
+                    <hr />
+                    <% } %>
+
+                        <!-- Review Form -->
+                        <% if (currentUser) { %>
+                            <div class="show-review-form">
+                                <h5>Rate this place</h5>
+                                <small>Tell others what you think.</small>
+                                <form action="/listings/<%= listing.id %>/reviews" method="POST"
+                                    class="needs-validation" novalidate>
+                                    <div class="mt-3 mb-2">
+                                        <fieldset class="starability-slot">
+                                            <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]"
+                                                value="1" checked aria-label="No rating." />
+                                            <input type="radio" id="first-rate1" name="review[rating]" value="1" />
+                                            <label for="first-rate1" title="Terrible!">1 star</label>
+                                            <input type="radio" id="first-rate2" name="review[rating]" value="2" />
+                                            <label for="first-rate2" title="Not good!">2 stars</label>
+                                            <input type="radio" id="first-rate3" name="review[rating]" value="3" />
+                                            <label for="first-rate3" title="Average!">3 stars</label>
+                                            <input type="radio" id="first-rate4" name="review[rating]" value="4" />
+                                            <label for="first-rate4" title="Very good!">4 stars</label>
+                                            <input type="radio" id="first-rate5" name="review[rating]" value="5" />
+                                            <label for="first-rate5" title="Amazing!">5 stars</label>
+                                        </fieldset>
+                                    </div>
+                                    <textarea name="review[comment]" class="show-review-textarea"
+                                        placeholder="Describe your experience..." rows="3" required></textarea>
+                                    <div class="invalid-feedback">Please add a comment.</div>
+                                    <button type="submit" class="show-review-submit">Submit Review</button>
+                                </form>
+                            </div>
+                            <hr />
+                            <% } %>
+
+                                <!-- Reviews List -->
+                                <div class="show-reviews">
+                                    <h5>Reviews <span class="show-review-count">(<%= listing.reviews.length %>)</span>
+                                    </h5>
+                                    <% if (listing.reviews.length===0) { %>
+                                        <p class="show-no-reviews">No reviews yet. Be the first to review!</p>
+                                        <% } %>
+                                            <div class="show-reviews-grid">
+                                                <% for(review of listing.reviews) { %>
+                                                    <div class="show-review-card">
+                                                        <div class="show-review-header">
+                                                            <div class="show-review-avatar">
+                                                                <%= review.author.username.charAt(0).toUpperCase() %>
+                                                            </div>
+                                                            <div>
+                                                                <p class="show-review-author">@<%=
+                                                                        review.author.username %>
+                                                                </p>
+                                                                <small class="show-review-date">
+                                                                    <%= new Date(review.createAt).toDateString() %>
+                                                                </small>
+                                                            </div>
+                                                        </div>
+                                                        <div class="show-review-stars">
+                                                            <% for(let i=1; i <=review.rating; i++) { %>
+                                                                <i class="fa-solid fa-star"
+                                                                    style="color:#ff385c; font-size:0.8rem;"></i>
+                                                                <% } %>
+                                                                    <% for(let i=1; i <=(5-review.rating); i++) { %>
+                                                                        <i class="fa-regular fa-star"
+                                                                            style="color:#ff385c; font-size:0.8rem;"></i>
+                                                                        <% } %>
+                                                        </div>
+                                                        <p class="show-review-comment">
+                                                            <%= review.comment %>
+                                                        </p>
+                                                        <% if (currentUser && currentUser._id.equals(review.author._id))
+                                                            { %>
+                                                            <form
+                                                                action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE"
+                                                                method="post">
+                                                                <button class="show-review-delete">Delete</button>
+                                                            </form>
+                                                            <% } %>
+                                                    </div>
+                                                    <% } %>
+                                            </div>
+                                </div>
+
+            </div>
+
+            <!-- Right Column - Price Card -->
+
+            <div class="show-right">
+                <div class="show-price-card">
+                    <div class="show-price">
+                        <span class="show-price-amount">&#8377;<%= listing.price.toLocaleString("en-IN") %></span>
+                        <span class="show-price-label"> / night</span>
+                    </div>
+                    <div class="show-price-taxes">
+                        <small>+18% GST • &#8377;<%= Math.round(listing.price * 0.18).toLocaleString("en-IN") %>
+                                taxes</small>
+                    </div>
+                    <hr />
+                    <div class="show-price-total">
+                        <span>Total</span>
+                        <span>&#8377;<%= Math.round(listing.price * 1.18).toLocaleString("en-IN") %></span>
+                    </div>
+                    <form action="/listings/<%= listing._id %>/reserve" method="POST">
+                        <button type="submit" class="show-reserve-btn">
+                            <%= currentUser ? "Reserve" : "Login to Reserve" %>
+                        </button>
+                    </form>
+
+                    <p class="show-reserve-note">You won't be charged yet</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="/js/map.js"></script>
