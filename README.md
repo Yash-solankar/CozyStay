@@ -169,5 +169,5 @@ Through this project, I gained practical experience with:
 
 ## Developer
 
-**Daman**
+**Yash**
 Aspiring Software Developer passionate about building scalable web applications and creating intuitive user experiences.
